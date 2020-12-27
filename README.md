@@ -26,4 +26,4 @@ The velocity of tool trajectory is calculated in easy_ur5.py
 Detailed Documentation:
 Detailed documentation for a module can be found in docstrings of corresponding modules.
 
-No unit tests are contained in this application, as real robot experiments do tests.
+No unit tests are contained in this application, as tests are done by real robot experiments.

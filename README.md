@@ -23,4 +23,4 @@ calligrapht.robot_writing_logics would create control points of UR5 tool traject
 calligrapht.robot_writing_logics would call easy_ur5.py as API to control the real robot
 The velocity of tool trajectory is calculated in easy_ur5.py
 
-No unit tests contained in this application, since tests are done by real robot experiments
+No unit tests contained in this application, as tests are done by real robot experiments

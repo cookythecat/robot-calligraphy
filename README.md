@@ -6,11 +6,12 @@
 ![](https://drive.google.com/uc?export=view&id=15ytBxWexWYtei5TXEhPRHRf097GL4-JO)
 
 # Introduction:
-The Robot Calligraphy is an App for enabling UR5 perform traditional Chinese calligraphy. It includes writing paths extracting module and writing controlling module. By chronologically parsing the GIFs, the stroke order information can be obtained.
+The Robot Calligraphy is an App for enabling UR5 perform traditional Chinese calligraphy. It includes writing paths extracting module and writing controlling module. The stroke order information and writing paths are obtained from chinese character teaching GIFs (https://www.hanzi5.com/). 
 
 
 ### Extraction Procedure: 
-Transfer the GIF of a given character to an array of JPGs Only keep the JPGs that contain a whole stroke Apply gaussian blur to eliminate noises Apply CV2 inrange method to separate the red stroke Apply Zhang-Suen thinning to get the thinned image Apply BFS on each pixel to get the width of the stoke at that location
+The extraction module transfers each GIF of its correponding target Chinese character to an array of JPGs, then it discards JPGs which contain imcomplte stroke. Then it would apply gaussian blur to eliminate noises and call CV2 inrange method to separate stokes with red coloring. It would then apply Zhang-Suen thinning to get the thinned image and apply BFS on each pixel to get the width of the stoke at that location. The stroke order and writing direction information contained in these GIFs would also be extracted.
+
 
 ### Control:
 Control: calligraphy.robot_writing_logics would create control points of UR5 tool trajectory for the real world calligraphy.robot_writing_logics would call easy_ur5.py as API to control the real robot The velocity of tool trajectory is calculated in easy_ur5.py

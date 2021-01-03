@@ -6,22 +6,22 @@
 ![](https://drive.google.com/uc?export=view&id=15ytBxWexWYtei5TXEhPRHRf097GL4-JO)
 
 # Introduction:
-The Robot Calligraphy is an App for enabling UR5 perform traditional Chinese calligraphy. It includes writing paths extracting module and writing controlling module. The stroke order information and writing paths are obtained from chinese character teaching GIFs (https://www.hanzi5.com/). 
+The Robot Calligraphy is an App for enabling UR5 to perform traditional Chinese calligraphy. It includes the writing paths extracting module and writing controlling module. The stroke order information and writing paths are obtained from Chinese character teaching GIFs (https://www.hanzi5.com/). 
 
 
 ### Extraction Procedure: 
-The extraction module transfers each GIF of its correponding target Chinese character to an array of JPGs, then it discards JPGs which contain imcomplte stroke. Then it would apply gaussian blur to eliminate noises and call CV2 inrange method to separate stokes with red coloring. It would then apply Zhang-Suen thinning to get the thinned image and apply BFS on each pixel to get the width of the stoke at that location. The stroke order and writing direction information contained in these GIFs would also be extracted.
+The extraction module transfers each GIF of its corresponding target Chinese character to an array of JPGs; then it discards JPGs that contain incomplete stroke. Then it would apply gaussian blur to eliminate noises and call the `CV2` `inrange` method to separate stokes with red coloring. It would then use Zhang-Suen thinning to get the thinned image and apply BFS on each pixel to get the stoke's width at that location. The stroke order and writing direction information contained in these GIFs would also be extracted.
 
 
 ### Control:
-Control: calligraphy.robot_writing_logics would create control points of UR5 tool trajectory for the real world calligraphy.robot_writing_logics would call easy_ur5.py as API to control the real robot The velocity of tool trajectory is calculated in easy_ur5.py
+Control: `calligraphy.robot_writing_logics` would create control points of UR5 tool trajectory for the real world `calligraphy.robot_writing_logics` would call `easy_ur5.py` as API to control the real robot The velocity of tool trajectory is calculated in `easy_ur5.py`
 
 # Setup:
 step 1: Download this repository to your PC
   ```shell
   git clone https://github.com/cookythecat/robot-calligraphy.git
   ```
-step 2: Download data folder from https://drive.google.com/file/d/1an2gXKffbX_WSDOqu2Fo3RlClhHRknU7/view?usp=sharing. You can directly use data.json as the writing path library for robot calligraphy performance. You can extract paths from 20000+ GIFs library if you want to try exraction algorithrm or you want bigger writing paths lib. Unizip data.zip file and pult data folder directly under the root of the project.
+step 2: Download `data` folder from https://drive.google.com/file/d/1EykHtbVGWC1fR7g0C8apqqDcy9ovpkrc/view?usp=sharing. You can directly use `data.json` as the writing path library for robot calligraphy performance. If you want to try the extraction algorithm or want bigger writing paths lib, You can do it by using `cv.py` (you can find a GIFs library with 20000+ GIFs from the data folder). Unzip the `data.zip` file and put the data folder directly under the root of the project.
 
 step 3: Dependencies
 This implementation requires the following dependencies:
@@ -36,19 +36,28 @@ you can try:
 
 # Running Guidelines:
  ### Extraction: 
-You can run extract_and_save() in cv/cv.py once you have data folder under the root of the project. The result file data.json would be stored in data/ folder. Please comment the following two lines of code under parse_gif() if you to get a new library of writing paths.
-
-    cv2.imshow('union', union_map)
-    cv2.waitKey()
-
+Run `<your workspace>\cv\cv.py`
+If you want to see thinned image, input 'yes' 
+```shell
+show image? 
+Please enter yes or no: yes  
+```
+If you don't want to see thinned image, input 'no' 
+```shell
+show image? 
+Please enter yes or no: no  
+```
+NOTICE: `data.json` would be rewritten once you run `cv.py`; So if you want to use the default `data.json` provided by us, you need to copy `data.json` from your downloaded `data` folder to `<your workspace>\data\`.  
 ### Performance:
-Run calligrahpy/robot_writing_logics.py to let UR5 do robot calligraphy. Set your UR5 to the remote control model, and uncomment this line.
-  ```shell
-  #MACHINE = easy_ur5.EasyUr5()
-  ```
- Please make sure the HOST constant variable in calligraphy/easy_ur5.py match your robot's HOST.
+Run `<your workspace>\calligrahpy\robot_writing_logics.py` 
+
+```shell
+C:\Users\cooky\Anaconda3\python.exe C:/Users/cooky/PycharmProjects/robotCalligraphy/calligraphy/robot_writing_logics.py
+input a string you want to write: 测试
+input scale (you can try 0.0004 first): 0.0004
+```
+ If the local machine cannot connect to your UR5, Please make sure the HOST constant variable in `<your workspace>\calligraphy\easy_ur5.py` matches your robot's HOST.
  
-License
-----
+# License
 
 MIT

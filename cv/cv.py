@@ -4,7 +4,7 @@ import math
 import os
 import json
 import numpy as np
-import PIL
+import PIL.Image
 import cv2
 import data.common_characters
 
@@ -215,12 +215,13 @@ def get_circle(index, radius):
     return circle
 
 
-def parse_gif(url):
+def parse_gif(url, show_image):
     """
     parse a gif, get the writing paths of a character, the return of the method would be stored in a .json file if
     extract_and_save is called. the .json file can be used as reference for robot calligraphy
 
     :param url: the url of the GIF of the character
+    :param show_image boolean, if you want image to be shown
     :return: 2D array of data structures which contain the coordinates of points on the writing path and
     their corresponding width
     """
@@ -245,8 +246,9 @@ def parse_gif(url):
         processing_logic(container, all_black_set, gray_set)
 
     union_map = union(matrix_set)
-    cv2.imshow('union', union_map)
-    cv2.waitKey()
+    if show_image:
+        cv2.imshow('union', union_map)
+        cv2.waitKey()
     return complete_set
 
 
@@ -351,7 +353,7 @@ def load_character_lib(file):
     return user_dic
 
 
-def extract_and_save():
+def extract_and_save(show_image):
     """
     call this method to get a .json file of the writing paths of 3000+ commonly used chinese characters
     :return: none
@@ -368,10 +370,22 @@ def extract_and_save():
         name = '\\' + hex_value + '-bishun.gif'
 
         url = os.path.join(MY_PATH, r"..\data\chars" + name)
-        complete_set = parse_gif(url)
+        complete_set = parse_gif(url, show_image)
         buffer[hex_value] = complete_set
         if counter % 20 == 0 or i == 0x9f9f:
             write_json(JSON_DIR, buffer)
             buffer = {}
             print('counter: ', counter)
         counter += 1
+
+
+if __name__ == '__main__':
+    print("show image? ")
+    response = None
+    while response not in {"yes", "no"}:
+        response = input("Please enter yes or no: ")
+
+    if response == 'yes':
+        extract_and_save(True)
+    else:
+        extract_and_save(False)

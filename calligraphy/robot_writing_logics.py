@@ -9,21 +9,6 @@ The module would store all the trajectories it ever calculated in previously_cal
 this information when writing the same string.
 Please make sure previously_calculated_trajectory.json is existed in ..\data\
 Please make sure data.json is existed in ..\data\
-    Typical usage:
-        DIC = load_character_lib(open(CHAR_LIB_DIR, 'r'))
-        print(len(DIC))
-
-        MACHINE = None
-        MACHINE = easy_ur5.EASY_UR5()
-
-        write_considering_depth(
-            '你想写的字符串',
-            1 / 2400,
-            DIC,
-            math.pi,
-            double_linear3_mapping,
-            MACHINE,
-        )
 """
 import time
 import copy
@@ -63,6 +48,8 @@ def reduce_by_multiple(trajectory, integer):
     :return: the reduced trajectory
     """
     reduced = trajectory[0:len(trajectory) - 1:integer]
+    if len(reduced) == 0:
+        return trajectory
     if reduced[-1] != trajectory[len(trajectory) - 1]:
         reduced.append(trajectory[len(trajectory) - 1])
     return reduced
@@ -151,9 +138,10 @@ def broke_stroke(trajectory):
         x_dif0 = x1 - x0
         x_dif1 = x2 - x1
 
-        if x_dif0 * x_dif1 < 0 and (abs(x_dif0) > 0.001 or abs(x_dif1)
-                                    > 0.001) or y_dif0 * y_dif1 < 0 \
-                and (abs(y_dif0) > 0.001 or abs(y_dif1) > 0.002):
+        max_tolerance = 0.006
+        if (x_dif0 * x_dif1 < 0 and (abs(x_dif0) > max_tolerance or abs(x_dif1)
+                                     > max_tolerance)) or (y_dif0 * y_dif1 < 0 \
+                                                   and (abs(y_dif0) > max_tolerance or abs(y_dif1) > max_tolerance)):
             stroke_group.append([trajectory[pointer1:i + 1], True])
             pointer1 = i + 1
     if pointer1 == len(trajectory) - 1:
@@ -188,26 +176,28 @@ def double_linear3_mapping(
     prev_point2d = stroke_info[0][0]
     for point in stroke_info:
         point3d = copy.deepcopy(point[0])
+        direction = numpy.array(point3d) - numpy.array(prev_point2d)
+        if prev_point2d == point3d:
+            standard_direction = 0
+        else:
+            standard_direction = numpy.array(direction) / numpy.linalg.norm(direction)
         point3d = [x * scale_factor for x in point3d]
         w = point[1] * scale_factor
-
         if w > DEEPEST_WIDTH:
             w = DEEPEST_WIDTH
-        direction = numpy.array(prev_point2d) - numpy.array(point3d)
-        direction_norm = numpy.array(direction) / sum(direction)
 
         if w <= MIDDLE_WIDTH:
             deviation_needed = linear_function(STRAIGHT_WIDTH,
                                                MIDDLE_WIDTH, STRAIGHT_DEVIATION, MIDDLE_DEVIATION,
                                                w)
-            point3d = point3d + direction_norm * deviation_needed
+            point3d = numpy.array(point3d) + numpy.array(standard_direction * deviation_needed)
             depth = linear_function(STRAIGHT_WIDTH, MIDDLE_WIDTH,
                                     STRAIGHT_HEIGHT, MIDDLE_HEIGHT, w)
         else:
             deviation_needed = linear_function(MIDDLE_WIDTH,
                                                DEEPEST_WIDTH, MIDDLE_DEVIATION, DEEPEST_DEVIATION,
                                                w)
-            point3d = point3d + direction_norm * deviation_needed
+            point3d = numpy.array(point3d) + numpy.array(standard_direction * deviation_needed)
             depth = linear_function(MIDDLE_WIDTH, DEEPEST_WIDTH,
                                     MIDDLE_HEIGHT, DEEPEST_HEIGHT, w)
         point3d = point3d.tolist()
@@ -365,6 +355,7 @@ def write_considering_depth(
             character = character[5:-1]
 
             if character not in dictionary:
+                print('characters cannot be found in data.json')
                 START_POSITION[0] = START_POSITION[0] + scale * 1.1
                 continue
 
@@ -407,21 +398,37 @@ def try_previously_calculated_trajectory(composed_key):
         load_character_lib(open(JSON_DIR
                                 , 'r'))
     if composed_key in previously_calculated_trajectory:
+        print('trajectory record founded')
         return previously_calculated_trajectory[composed_key], previously_calculated_trajectory
     return None, previously_calculated_trajectory
 
 
 if __name__ == '__main__':
+    # ask for argument
+    string_to_write = ''
+    scale = 0.0004
+    while True:
+        try:
+            string_to_write = input('input a string you want to write: ')
+            scale = float(input('input scale (you can try 0.0004 first): '))
+        except ValueError:
+            print("please input valid value")
+            continue
+        else:
+            break
+
+    # read lib
     DIC = \
         load_character_lib(open(CHAR_LIB_DIR, 'r'))
     print(len(DIC))
 
+    # connect to UR5
     MACHINE = None
-    #MACHINE = easy_ur5.EasyUr5()
+    MACHINE = easy_ur5.EasyUr5()
 
     write_considering_depth(
-        '新字符串',
-        1 / 2400,
+        string_to_write,
+        scale,
         DIC,
         math.pi,
         double_linear3_mapping,

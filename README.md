@@ -49,7 +49,7 @@ Please enter yes or no: no
 ```
 NOTICE: `data.json` would be rewritten once you run `cv.py`; So if you want to use the default `data.json` provided by us, you need to copy `data.json` from your downloaded `data` folder to `<your workspace>\data\`.  
 ### Performance:
-Run `<your workspace>\calligrahpy\robot_writing_logics.py` 
+Run `<your workspace>\calligrahpy\robot_writing_logics.py`, input the size of the character you would like your UR5 to write; Also input the scale factor (a float value, you can try 0.0004 first and then fine-tune this value)
 
 ```shell
 C:\Users\cooky\Anaconda3\python.exe C:/Users/cooky/PycharmProjects/robotCalligraphy/calligraphy/robot_writing_logics.py
